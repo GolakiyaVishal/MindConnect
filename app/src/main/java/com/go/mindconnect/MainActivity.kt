@@ -5,16 +5,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.go.mindconnect.ui.theme.MindConnectTheme
@@ -28,7 +33,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         mMediaPlayer = MediaPlayer.create(this, R.raw.wolf_howling)
-
         setContent {
             MindConnectTheme {
                 // A surface container using the 'background' color from the theme
@@ -46,6 +50,11 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(mMediaPlayer: MediaPlayer) {
+
+    var count by remember {
+        mutableStateOf(20)
+    }
+
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
             title = { Text("FOCUS") },
@@ -55,15 +64,25 @@ fun MainContent(mMediaPlayer: MediaPlayer) {
         )
     }, bottomBar = {
         BottomAppBar {
-            BottomContent(mMediaPlayer)
+            BottomContent(mMediaPlayer, count)
         }
     }) { paddingValues ->
-        Body(paddingValues)
+        Body(paddingValues, count = count, onAddTap = { count += 10 },
+            onRemoveTap = {
+                if (count > 10) {
+                    count -= 10
+                }
+            })
     }
 }
 
 @Composable
-fun Body(paddingValues: PaddingValues) {
+fun Body(
+    paddingValues: PaddingValues,
+    count: Int,
+    onAddTap: () -> Unit,
+    onRemoveTap: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,12 +92,25 @@ fun Body(paddingValues: PaddingValues) {
     ) {
         BodyText("Keep Doing It...")
         BodyText("This is the Way.")
+        Spacer(modifier = Modifier.weight(1.0f))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TimeButton(Icons.Rounded.Clear) { onRemoveTap() }
+            Text(count.toString())
+            TimeButton(Icons.Rounded.AddCircle) { onAddTap() }
+        }
     }
 }
 
 @Composable
-fun BottomContent(mMediaPlayer: MediaPlayer) {
+fun BottomContent(mMediaPlayer: MediaPlayer, count: Int) {
     var timer: Timer? = null
+    val gap = count * 1000
 
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -86,7 +118,7 @@ fun BottomContent(mMediaPlayer: MediaPlayer) {
     ) {
         BottomButton(label = "Start") {
             timer = Timer()
-            timer!!.scheduleAtFixedRate(WolfTimer(mMediaPlayer), 0, 20000)
+            timer!!.scheduleAtFixedRate(WolfTimer(mMediaPlayer), 0, gap.toLong())
         }
         BottomButton(label = "Stop") {
             timer?.cancel()
@@ -118,6 +150,13 @@ fun BodyText(text: String) {
 fun BottomButton(label: String, onTap: () -> Unit) {
     TextButton(onClick = { onTap() }) {
         Text(text = label, fontSize = 18.sp)
+    }
+}
+
+@Composable
+fun TimeButton(icon: ImageVector, onTap: () -> Unit) {
+    IconButton(onClick = { onTap() }, Modifier.padding(12.dp)) {
+        Icon(icon, contentDescription = "Add 10 seconds", Modifier.size(42.dp))
     }
 }
 
