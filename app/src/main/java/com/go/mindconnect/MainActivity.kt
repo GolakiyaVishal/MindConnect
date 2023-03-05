@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -92,6 +91,16 @@ fun Body(
     ) {
         BodyText("Keep Doing It...")
         BodyText("This is the Way.")
+        BodyText2(
+            "Tired                —>     Nap \n" +
+                    "Sad                   —>     Music \n" +
+                    "Stressed          —>     Walk  \n" +
+                    "Angry               —>     Exercise \n" +
+                    "Burnt out         —>     Read \n" +
+                    "Feeling lost     —>     Pray \n" +
+                    "Overthinking   —>     Write \n" +
+                    "Anxious           —>     Meditate "
+        )
         Spacer(modifier = Modifier.weight(1.0f))
         Row(
             modifier = Modifier
@@ -136,6 +145,26 @@ fun BodyText(text: String) {
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
                 lineHeight = 2.5.em,
+                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                lineHeightStyle = LineHeightStyle(
+                    alignment = LineHeightStyle.Alignment.Center,
+                    trim = LineHeightStyle.Trim.None
+                )
+            )
+        )
+    )
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+fun BodyText2(text: String) {
+    Text(
+        text = text,
+        style = LocalTextStyle.current.merge(
+            TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                lineHeight = 1.em,
                 platformStyle = PlatformTextStyle(includeFontPadding = false),
                 lineHeightStyle = LineHeightStyle(
                     alignment = LineHeightStyle.Alignment.Center,
